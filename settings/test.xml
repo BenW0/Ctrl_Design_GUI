@@ -1,0 +1,27 @@
+<Machine debugstr="'" getparam="g" name="Control Designer" setparam="s">
+	<Commands>
+		<Command cmd="i" name="Idle Mode" />
+		<Command cmd="f" name="Motor: Fixed Mode" />
+		<Command cmd="m 0" name="Motor: Step Mode" />
+		<Command cmd="cp" name="Ctrl: PID Mode" />
+		<Command cmd="cu" name="Ctrl: Unity Mode" />
+		<Command cmd="ps" name="Path: Step Mode" />
+    <Command cmd="" name="Path: Load Custom">scripts.uploadCustomPath()</Command>
+    <Command cmd="pcs" name="Path: Start Custom" />
+		<Command cmd="" name="Ctrl History Dump">scripts.readCtrlHistory()</Command>
+	</Commands>
+	<Parameters>
+		<Parameter cmd="q" name="Encoder tics/step" readonly="0" tab="Main" type="Float">2.2443</Parameter>
+		<Parameter cmd="f" name="Fixed Frequency (steps/min)" readonly="0" tab="Main" type="Int">0</Parameter>
+		<Parameter cmd="t" name="Encoder Ticks" readonly="0" tab="Main" type="Int">514</Parameter>
+		<Parameter cmd="m" name="Motor Steps" readonly="0" tab="Main" type="Int">0</Parameter>
+		<Parameter cmd="o" name="ShowPos Freq (ms)" readonly="0" tab="Main" type="UInt">0</Parameter>
+		<Parameter cmd="p" name="Ctrl Update Period (ms)" readonly="0" tab="Main" type="Float">0</Parameter>
+		<Parameter cmd="u" name="Last Ctrl Update Time (ms)" readonly="1" tab="Main" type="Float">0</Parameter>
+		
+		<Parameter cmd="kp" name="PID P" readonly="0" tab="PID" type="Float">0</Parameter>
+		<Parameter cmd="ki" name="PID I" readonly="0" tab="PID" type="Float">0</Parameter>
+		<Parameter cmd="kd" name="PID D" readonly="0" tab="PID" type="Float">0</Parameter>
+	</Parameters>
+		
+</Machine>
