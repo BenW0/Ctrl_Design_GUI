@@ -14,7 +14,7 @@
 		<Command name="Ctrl History Dump" cmd="">scripts.readCtrlHistory()</Command>
 	</Commands>
 	<Parameters>
-		<Parameter name="Encoder tics/step" cmd="q" readonly="0" type="Float" tab="Main">1.4986</Parameter>
+		<Parameter name="Encoder tics/step" cmd="q" readonly="0" type="Float" tab="Main">21.7343</Parameter>
 		<Parameter name="Fixed Frequency (steps/min)" cmd="f" readonly="0" type="Int" tab="Main">-1</Parameter>
 		<Parameter name="Encoder Ticks" cmd="t" readonly="0" type="Int" tab="Main">0</Parameter>
 		<Parameter name="Motor Steps" cmd="mp" readonly="0" type="Int" tab="Main">0</Parameter>
@@ -24,16 +24,17 @@
 		<Parameter name="Ctrl Update Period (ms)" cmd="p" readonly="0" type="Float" tab="Control">5.0</Parameter>
 		<Parameter name="Last Ctrl Update Time (ms)" cmd="u" readonly="1" type="Float" tab="Control">0</Parameter>
 		<Parameter name="Ctrl Min Vel (tics/min)" cmd="i" readonly="0" type="Float" tab="Control">0.0</Parameter>
-		<Parameter name="Ctrl Max Vel (tics/min)" cmd="a" readonly="0" type="Float" tab="Control">1000000</Parameter>
-		<Parameter name="Ctrl To Position" cmd="km" readonly="0" type="UInt" tab="Control">0</Parameter>
+		<Parameter name="Ctrl Max Vel (tics/min)" cmd="a" readonly="0" type="Float" tab="Control">21000000</Parameter>
+		<Parameter name="Ctrl To Position" cmd="km" readonly="0" type="UInt" tab="Control">1</Parameter>
 		<Parameter name="Feedforward advance (steps)" cmd="kf" readonly="0" type="UInt" tab="Control">0</Parameter>
+		<Parameter name="Fault Threshold (tics)" cmd="kt" readonly="0" type="Float" tab="Control">10.0</Parameter>
 		
 		<Parameter name="PID P" cmd="kp" readonly="0" type="Float" tab="PID">0</Parameter>
 		<Parameter name="PID I" cmd="ki" readonly="0" type="Float" tab="PID">0</Parameter>
 		<Parameter name="PID D" cmd="kd" readonly="0" type="Float" tab="PID">0</Parameter>
 		
 		<Parameter name="Sine Count" cmd="sc" readonly="0" type="UInt" tab="Sines">5</Parameter>
-		<Parameter name="Sine Amp" cmd="sa" readonly="0" type="Float" tab="Sines">20</Parameter>
+		<Parameter name="Sine Amp" cmd="sa" readonly="0" type="Float" tab="Sines">2000</Parameter>
 		<Parameter name="Sine Freq" cmd="sf" readonly="0" type="Float" tab="Sines">1</Parameter>
 		
 	</Parameters>

@@ -47,6 +47,8 @@ class cMainGui(QtGui.QMainWindow) :
     
     def __init__(self, parent=None):
         QtGui.QMainWindow.__init__(self)
+        
+        self.ctrl_down = False
 
         uic.loadUi("gui.ui", self)
 
@@ -214,6 +216,10 @@ class cMainGui(QtGui.QMainWindow) :
                     curTab.gridLayout_3.addWidget(bAuto, i, 4, 1, 1)
                     curTab.bAutoList.append(bAuto)
                     self.onlineWidgets.append(bAuto)
+                    
+                    # link the set button to the auto button for "reset" function
+                    bSet.bAuto_Link = bAuto;
+                    bAuto.bSet_Link = bSet;
 
                     rowToUse = i
 
@@ -357,22 +363,38 @@ class cMainGui(QtGui.QMainWindow) :
             self.statusBar().showMessage('Read Error!')
         
     def bSetParam_Clicked(self) :
-        if self.sender().machine_paramLink.setValidValue(self.sender().textField_Link.toPlainText()) :
-            # Value is acceptable. Write it to the device
-            self.sender().machine_paramLink.setToDevice()
-            self.statusBar().showMessage('Ready')
+        # If we are in Auto mode or if ctrl is held down, send a reset instead of a set
+        if self.sender().bAuto_Link.isChecked() or QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier :
+            self.sender().machine_paramLink.restoreDefault()
+            # Now re-read the result...
+            if self.sender().machine_paramLink.getFromDevice() :
+                # It worked! Update the text box
+                self.sender().textField_Link.setPlainText(str(self.sender().machine_paramLink.value))
+                self.statusBar().showMessage('Ready')
+            else :
+                self.statusBar().showMessage('Read Error!')
         else :
-            # Invalid value
-            print("Could not parse value!")
-            self.statusBar().showMessage('Parse Error!')
+            if self.sender().machine_paramLink.setValidValue(self.sender().textField_Link.toPlainText()) :
+                # Value is acceptable. Write it to the device
+                self.sender().machine_paramLink.setToDevice()
+                self.statusBar().showMessage('Ready. Use Ctrl+Click to Reset to Default.')
+            else :
+                # Invalid value
+                print("Could not parse value!")
+                self.statusBar().showMessage('Parse Error!')
     
     def bAutoParam_Clicked(self) :
         if self.sender().isChecked() :
             p = self.sender().textField_Link.palette()
             self.sender().textField_Link.old_palette = self.sender().textField_Link.palette()
             p.setColor(QtGui.QPalette.Active, QtGui.QPalette.Base, QtCore.Qt.yellow)
+            self.sender().bSet_Link.setText("Reset")
         else :
             p = self.sender().textField_Link.old_palette
+            if self.ctrl_down :
+                self.sender().bSet_Link.setText("Res")
+            else :
+                self.sender().bSet_Link.setText("Set")
         self.sender().textField_Link.setPalette(p)
 
     # this is almost identical to bSetParam_Clicked, except self.sender() is the onelinetext object
@@ -395,6 +417,19 @@ class cMainGui(QtGui.QMainWindow) :
     # This routine runs every 200 ms and updates all fields with their "auto"
     # buttons toggled.
     def autoTimer(self) :
+        # check to see if we need to update Set button tetxt
+        if self.ctrl_down and QtGui.QApplication.keyboardModifiers() != QtCore.Qt.ControlModifier :
+            update_texts = True
+            newtext = "Set"
+            self.ctrl_down = False
+        elif not self.ctrl_down and QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier :
+            update_texts = True
+            newtext = "Res"
+            self.ctrl_down = True
+        else :
+            update_texts = False
+        
+        # update param values and Set button texts
         if comm.IsOpen() :
             for tab in self.tabData :
                 for bAuto in tab.bAutoList :
@@ -402,6 +437,9 @@ class cMainGui(QtGui.QMainWindow) :
                         if bAuto.machine_paramLink.getFromDevice(True) :
                             # It worked! Update the text box
                             bAuto.textField_Link.setPlainText(str(bAuto.machine_paramLink.value))
+                    elif update_texts :
+                        # also update the Set button texts
+                        bAuto.bSet_Link.setText(newtext)
 
 app = None
     

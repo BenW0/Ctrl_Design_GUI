@@ -35,7 +35,8 @@ histStruct = struct.Struct("=Llffffl")
 ##{
 ##  uint32_t time;
 ##  int32_t position;
-##  float velocity;
+##  //float velocity;
+##  float pos_error_deriv;
 ##  float cmd_velocity;
 ##  float target_pos;
 ##  float target_vel;
@@ -79,6 +80,7 @@ def readCtrlHistory() :
     ts = []
     ps = []
     vs = []
+    pos_error_derivs = []
     cmd_vs = []
     target_ps = []
     target_vs = []
@@ -90,7 +92,8 @@ def readCtrlHistory() :
             fout.write("%f, %i, %f, %f, %f, %f, %i\n" % d)
             ts.append(d[0] * 0.00001)
             ps.append(d[1])
-            vs.append(d[2])
+            #vs.append(d[2])
+            pos_error_derivs.append(d[2])
             cmd_vs.append(d[3])
             target_ps.append(d[4])
             target_vs.append(d[5])
@@ -104,6 +107,8 @@ def readCtrlHistory() :
        figwindows[1].move(400, 0)
        figwindows.append(plotgui.PlotWindow())
        figwindows[2].move(800, 0)
+       figwindows.append(plotgui.PlotWindow())
+       figwindows[3].move(1200, 0)
     fig = figwindows[0].init_plot()
     fig.plot(ts, ps, 'b-', label='Position')
     fig.hold(True)
@@ -119,7 +124,7 @@ def readCtrlHistory() :
     figwindows[0].show()
     
     fig = figwindows[1].init_plot()
-    fig.plot(ts, vs, 'c-', label='Velocity')
+    #fig.plot(ts, vs, 'c-', label='Velocity')
     fig.hold(True)
     fig.plot(ts, target_vs, 'r--', label='Target Velocity')
     fig.plot(ts, cmd_vs, 'g-', label='Command Velocity')
@@ -142,6 +147,15 @@ def readCtrlHistory() :
     
     figwindows[2].render_plot()
     figwindows[2].show()
+    
+    fig = figwindows[3].init_plot()
+    fig.plot(ts, pos_error_derivs, 'b-', label='Position Error Derivative')
+    fig.xaxis.label.set_text('Time (s)')
+    fig.yaxis.label.set_text('Error change (tics/update)')
+    fig.title.set_text('Position Error Derivative')
+    
+    figwindows[3].render_plot()
+    figwindows[3].show()
 
 
 def closeWindows() :

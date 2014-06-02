@@ -92,6 +92,7 @@ class Machine :
                         for param in self.params :
                             if param.name.lower() == vparam.attrib['name'].lower() :
                                 param.value = vparam.text
+                                param.default_value = vparam.text
 
     # saves back the Machine structure to the xml file
     def save(self, fname) :
@@ -157,6 +158,7 @@ class Param :
         self.readOnly = False
         self.datatype = 'Int'
         self.value = 0
+        self.default_value = 0
         self.tab = ''
         self.xmlnode = None
 
@@ -177,6 +179,7 @@ class Param :
         if xmlnode.attrib.has_key('tab') :
             self.tab = xmlnode.attrib['tab']
         self.value = xmlnode.text
+        self.default_value = xmlnode.text
 
     def updatexml(self) :
         if self.xmlnode != None :
@@ -223,6 +226,13 @@ class Param :
 
     # Sets the value to the device
     def setToDevice(self) :
+        if comm.IsOpen() :
+            print ">" + machine.set_cmd + self.cmd + ' ' + str(self.value)
+            comm.Write(machine.set_cmd + self.cmd + ' ' + str(self.value))
+    
+    # Restores the value to default and sets the value to the device.
+    def restoreDefault(self) :
+        self.value = self.default_value
         if comm.IsOpen() :
             print ">" + machine.set_cmd + self.cmd + ' ' + str(self.value)
             comm.Write(machine.set_cmd + self.cmd + ' ' + str(self.value))
