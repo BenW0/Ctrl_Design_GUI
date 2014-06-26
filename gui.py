@@ -25,6 +25,8 @@ import machineInterface as mach
 import scripts
 
 BAUDRATE = 119200   # Built to work with a Teensy, which is baudrate-agnostic
+ADS_ESCAPE = "$"    # Escape character to use with an alternate data stream (see scripts.py, comm.py)
+ADS_FIELDLEN = 28   # length of alternate data streams (bytes)
 
 # structure to hold information about tabs and their widgets
 class TabContents :
@@ -78,7 +80,7 @@ class cMainGui(QtGui.QMainWindow) :
         self.show()
 
     def closeEvent(self, event) :
-        scripts.closeWindows()
+        scripts.plotter.closeWindows()
         app.quit()
         event.accept()
 
@@ -311,6 +313,11 @@ class cMainGui(QtGui.QMainWindow) :
         
     def bConnect_click(self) :
         if comm.IsOpen() :
+            # send the Idle Mode command before we close, as a safety measure.
+            for cmd in mach.machine.cmds :
+                if cmd.name.lower().find("idle") > -1 :
+                    cmd.doAction()
+                    break
             try :
                 comm.Close()
             except comm.ser.SerialException as e:
@@ -324,7 +331,7 @@ class cMainGui(QtGui.QMainWindow) :
                     widget.setDisabled(True)
         else :
             try :
-                comm.Open(str(self.cPort.currentText()), BAUDRATE)
+                comm.Open(str(self.cPort.currentText()), BAUDRATE, ADS_ESCAPE, ADS_FIELDLEN)
             except comm.ser.SerialException as e :
                 print(str(e))
                 self.statusBar().showMessage('Error connecting to ' + str(self.cPort.currentText()))

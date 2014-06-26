@@ -196,7 +196,7 @@ class Param :
             if not quiet :
                 print ">" + machine.get_cmd + self.cmd
             comm.Write(machine.get_cmd + self.cmd)
-            for i in range(0,5) :   # read a few lines in case there's other dribble
+            for i in range(0,15) :   # read a few lines in case there's other dribble
                 line = comm.ReadLn()
                 #print '"' + line + '"'
                 if '' == line :
@@ -213,15 +213,15 @@ class Param :
                             self.value = int(data)
                         elif self.datatype.lower() == "float" :
                             self.value = float(data)
-                        else :  # assumed to be string, keep the whole line
-                            self.value = data
+                        else :  # assumed to be string, keep the whole line, sans white-space
+                            self.value = line.strip()
                         return True
                     except ValueError :
                         if not quiet :
                             print("Error parseing response from chip! Tried to parse '%s' and failed. Whole line: %s" % (data, line))
                         return False
                 else :
-                    print line + ";"
+                    print line,
         return False
 
     # Sets the value to the device

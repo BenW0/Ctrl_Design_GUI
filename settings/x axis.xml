@@ -1,0 +1,41 @@
+<Machine debugstr="'" getparam="g" name="Control Designer" setparam="s">
+	<Commands>
+		<Command cmd="i" name="Idle Mode" />
+		<Command cmd="f" name="Motor: Fixed Mode" />
+		<Command cmd="m 0" name="Motor: Step Mode" />
+		<Command cmd="cp" name="Ctrl: PID Mode" />
+		<Command cmd="cu" name="Ctrl: Unity Mode" />
+		<Command cmd="cb" name="Ctrl: Bang Mode" />
+		<Command cmd="ps" name="Path: Step Mode" />
+    <Command cmd="" name="Path: Load Custom">scripts.uploadCustomPath()</Command>
+    <Command cmd="pcs" name="Path: Start Custom" />
+    <Command cmd="pq" name="Path: Sines" />
+		<Command cmd="" name="Ctrl History Dump">scripts.readCtrlHistory()</Command>
+	</Commands>
+	<Parameters>
+		<Parameter cmd="q" name="Encoder tics/step" readonly="0" tab="Main" type="Float">1.4986</Parameter>
+		<Parameter cmd="f" name="Fixed Frequency (steps/min)" readonly="0" tab="Main" type="Int">-1</Parameter>
+		<Parameter cmd="t" name="Encoder Ticks" readonly="0" tab="Main" type="Int">0</Parameter>
+		<Parameter cmd="mp" name="Motor Steps" readonly="0" tab="Main" type="Int">0</Parameter>
+		<Parameter cmd="o" name="ShowPos Freq (ms)" readonly="0" tab="Main" type="UInt">0</Parameter>
+		<Parameter cmd="mf" name="Force pit0 timing reset" readonly="0" tab="Main" type="UInt">1</Parameter>
+		
+		<Parameter cmd="p" name="Ctrl Update Period (ms)" readonly="0" tab="Control" type="Float">5.0</Parameter>
+		<Parameter cmd="u" name="Last Ctrl Update Time (ms)" readonly="1" tab="Control" type="Float">0</Parameter>
+		<Parameter cmd="i" name="Ctrl Min Vel (tics/min)" readonly="0" tab="Control" type="Float">0.0</Parameter>
+		<Parameter cmd="a" name="Ctrl Max Vel (tics/min)" readonly="0" tab="Control" type="Float">1000000</Parameter>
+		<Parameter cmd="km" name="Ctrl To Position" readonly="0" tab="Control" type="UInt">1</Parameter>
+		<Parameter cmd="kf" name="Feedforward advance (steps)" readonly="0" tab="Control" type="UInt">0</Parameter>
+		<Parameter cmd="kt" name="Fault Threshold (tics)" readonly="0" tab="Control" type="Float">10.0</Parameter>
+		
+		<Parameter cmd="kp" name="PID P" readonly="0" tab="PID" type="Float">0</Parameter>
+		<Parameter cmd="ki" name="PID I" readonly="0" tab="PID" type="Float">0</Parameter>
+		<Parameter cmd="kd" name="PID D" readonly="0" tab="PID" type="Float">0</Parameter>
+		
+		<Parameter cmd="sc" name="Sine Count" readonly="0" tab="Sines" type="UInt">5</Parameter>
+		<Parameter cmd="sa" name="Sine Amp" readonly="0" tab="Sines" type="Float">20</Parameter>
+		<Parameter cmd="sf" name="Sine Freq" readonly="0" tab="Sines" type="Float">1</Parameter>
+		
+	</Parameters>
+		
+</Machine>
