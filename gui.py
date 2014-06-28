@@ -25,7 +25,7 @@ import machineInterface as mach
 import scripts
 
 BAUDRATE = 119200   # Built to work with a Teensy, which is baudrate-agnostic
-ADS_ESCAPE = "$"    # Escape character to use with an alternate data stream (see scripts.py, comm.py)
+ADS_ESCAPE = ""    # Escape character to use with an alternate data stream (see scripts.py, comm.py). Disabled because it doesn't work with the datarate I need.
 ADS_FIELDLEN = 28   # length of alternate data streams (bytes)
 
 # structure to hold information about tabs and their widgets

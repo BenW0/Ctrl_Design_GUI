@@ -98,7 +98,7 @@ def ReadLn() :
         else :
             # scan through the data and look for ads escapes
             line = serobj.readline()
-            while line.rfind(serobj.escape) > len(line) - serobj.escape_len :
+            while line.rfind(serobj.escape) >= 0 and line.rfind(serobj.escape) > len(line) - serobj.escape_len :
                 # we have an escape and the packet contains a newline character. Read another line and append.
                 line = line + serobj.readline()
             return AdsScan(line)
