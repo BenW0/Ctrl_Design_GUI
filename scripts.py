@@ -20,7 +20,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
-import comm
+from comm import *
 import time
 import struct
 import sip
@@ -45,6 +45,8 @@ histStruct = struct.Struct("=Llffffl")
 ##  float target_vel;
 ##  int32_t motor_position;
 ##} hist_data_t;
+
+DS_STREAM_HIST = 0           # data stream used for history downloading
 
 
 
@@ -82,6 +84,21 @@ def uploadCustomPath() :
         time.sleep(0.02)
     
 
+    
+def convertBinaryDump(fname_in, fname_out) :
+    """Converts a RawHID binary file dump into csv format. This is NOT the
+    same as converting a binary dump from the old over-serial ADS stream because
+    it does not use separator characters."""
+    with open(fname_in, "rb") as fin, open(fname_out, "w") as fout :
+         while True :
+            chunk = fin.read(histStruct.size)
+            if len(chunk) < histStruct.size :
+                break
+            else :
+                # parse out a hist struct
+                d = histStruct.unpack(chunk)
+                fout.write("%f, %i, %f, %f, %f, %f, %i\n" % d)
+
 # Plotting Class - plots single plots and data streams.
 # The next few script functions implement streaming data plotting, using the 
 # alternate data stream functionality of the comm module. After the plot is
@@ -106,6 +123,7 @@ class Plotter :
         self.target_ps = []
         self.target_vs = []
         self.motor_ps = []
+        self.stream_fname = ''
         
         # Figure windows (plotgui:FigureWindow objects)
         self.figwindows = []
@@ -118,9 +136,9 @@ class Plotter :
         comm.Write("gd")         # read back command
         buf = ''
         total = 0
-        time.sleep(0.015)
+        time.sleep(0.1)
         for i in range(0,100) :
-            buf += comm.Read()
+            buf += comm.ReadBlocking(50)
             if len(buf) > 10 and total == 0:
                 #try :
                 print("Getting " + buf.splitlines()[0] + " datapoints")
@@ -130,7 +148,7 @@ class Plotter :
                 #    total = 10000   # go until we're sure we're done...
             if 0 < total and len(buf) >= total * histStruct.size :# and comm.serobj.inWaiting() == 0 :
                 break
-            time.sleep(0.015)
+            time.sleep(0.03)
             print '.',
         else :
             print("Wanted %i bytes; got %i. Failing!" %(total * histStruct.size, len(buf)))
@@ -166,7 +184,35 @@ class Plotter :
         # also save off a copy of the machine at this time (so we know what was going on later)
         mach.machine.save("dumps/" + stamp + 'machine.xml')
 
-
+    def readHistFromFile(self, csvfname) :
+        # read back the history from file
+        self.ts = []
+        self.ps = []
+        self.vs = []
+        self.pos_error_derivs = []
+        self.cmd_vs = []
+        self.target_ps = []
+        self.target_vs = []
+        self.motor_ps = []
+        
+        with open(csvfname, "r") as fin :
+            fin.readline()      # read header line
+            for line in fin :
+                r = re.compile("[ \t\n\r,]+")
+                d = r.split(line)
+                if len(d) < 7 :
+                    break       # we're done with the file
+                self.ts.append(float(d[0]) * 0.00001)
+                self.ps.append(int(d[1]))
+                #vs.append(d[2])
+                self.pos_error_derivs.append(float(d[2]))
+                self.cmd_vs.append(float(d[3]))
+                self.target_ps.append(float(d[4]))
+                self.target_vs.append(float(d[5]))
+                self.motor_ps.append(float(d[6]))
+        
+        self.plotData()
+                
     def plotData(self) :
         """Plots the data generated using readCtrlHistory and/or streaming and stored in the class's data arrays"""
         
@@ -243,9 +289,10 @@ class Plotter :
         while len(self.figwindows) > 0 :
             self.figwindows.pop()
         
-    
+    '''
     # Starts a stream plot; creating the windows if they weren't already and 
-    # opening a file to save the results to.
+    # opening a file to save the results to. This is depricated in favor of
+    # the RawHID communication channel.
     def startStreamPlot(self) :
         """Starts a stream plot"""
         # Comm init is handled by the issuing command (and should be "ss 1")
@@ -309,7 +356,44 @@ class Plotter :
         # stop recording
         self.fstream.close()
         self.streaming = False
+    '''
+    
+    def startStreaming(self) :
+        """Starts streaming collection of data from the device, saved to a time-stamped
+        .bin file in the streams directory using the RawHID USB mode. This works better
+        than the old plotter.startStreamPlot mode, which used the serial console."""
+        # tell the rawhid interface program to start saving out data streams
+        self.streaming = True
+        fbase = "streams/" + timeStamped("")
+        self.stream_fname = fbase + "stream.bin"
+        comm.DataStreamStartSave(DS_STREAM_HIST, self.stream_fname)
         
+        # also save off a copy of the machine at this time (so we know what was going on later)
+        mach.machine.save(fbase + 'machine.xml')
+        
+        # tell the device to start streaming
+        comm.Write("ss 1")
+
+    def stopStreaming(self) :
+        """Stops streaming collection of data from the device being saved to the .bin
+        file, converts the .bin to .csv, and shows the results."""
+        # disable streaming
+        comm.Write("ss 0")
+        
+        # tell the rawhid proxy to stop saving the data stream
+        comm.DataStreamStopSave(DS_STREAM_HIST)
+        
+        self.streaming = False
+        
+        # convert the .bin to .csv
+        newname = self.stream_fname[:-3] + 'csv'
+        convertBinaryDump(self.stream_fname, newname)
+        
+        # display the data
+        self.readHistFromFile(newname)
+        
+    
+                
     
     
 plotter = Plotter()

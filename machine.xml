@@ -3,8 +3,8 @@
 	<Commands>
 		<Command name="Idle Mode"         cmd="i"  ></Command>
 		<Command name="Ctrl History Dump" cmd=""   >scripts.plotter.readCtrlHistory()</Command>
-		<Command name="Start Streaming Hist" cmd="ss 1">scripts.plotter.startStreamPlot()</Command>
-		<Command name="Stop Streaming Hist" cmd="ss 0" >scripts.plotter.stopStreamPlot()</Command>
+		<Command name="Start Streaming Hist" cmd="">scripts.plotter.startStreaming()</Command>
+		<Command name="Stop Streaming Hist" cmd="" >scripts.plotter.stopStreaming()</Command>
 		<Command name="Motor: Fixed Mode" cmd="f"  ></Command>
 		<Command name="Motor: Step Mode"  cmd="m 0"></Command>
 		<Command name="IMC Mode"          cmd="n" ></Command>

@@ -22,7 +22,7 @@
 ########################################################
 
 import xml.etree.cElementTree as ET
-import comm
+from comm import *
 import time
 import re
 import scripts

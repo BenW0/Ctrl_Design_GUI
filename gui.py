@@ -20,7 +20,7 @@ from PyQt4 import uic, QtCore, QtGui
 from qonelinetextedit import *
 import sys
 
-import comm
+from comm import *
 import machineInterface as mach
 import scripts
 
@@ -38,6 +38,7 @@ class TabContents :
         self.bGetList = []
         self.bAutoList = []
         # more parameters added dynamically
+        
 
 
 class cMainGui(QtGui.QMainWindow) :
@@ -50,6 +51,8 @@ class cMainGui(QtGui.QMainWindow) :
     def __init__(self, parent=None):
         QtGui.QMainWindow.__init__(self)
         
+        comm.Init()     # let the comm do things now that qt is set up (rawhid needs this)
+        
         self.ctrl_down = False
 
         uic.loadUi("gui.ui", self)
@@ -61,6 +64,7 @@ class cMainGui(QtGui.QMainWindow) :
         self.tSerialListener = QtCore.QTimer()
         self.tSerialListener.timeout.connect(self.serialTimer)
         self.tSerialListener.setInterval(50)
+        self.tSerialListener.start()
         
         # add a timer for updating fields marked "auto"
         self.tAutoTimer = QtCore.QTimer()
@@ -77,10 +81,13 @@ class cMainGui(QtGui.QMainWindow) :
         # populate the list of ports
         self.bPort_click(True);
         
+        #self.delayedcalls = []      # list of functions to call on the next tSerialListener loop (needed because rawhid doesn't receive new data during an event)
+        
         self.show()
 
     def closeEvent(self, event) :
         scripts.plotter.closeWindows()
+        comm.Quit()
         app.quit()
         event.accept()
 
@@ -326,20 +333,15 @@ class cMainGui(QtGui.QMainWindow) :
             else :
                 self.statusBar().showMessage('Disconnected.')
                 self.bConnect.setText('Connect')
-                self.tSerialListener.stop()
                 for widget in self.onlineWidgets :
                     widget.setDisabled(True)
         else :
-            try :
-                comm.Open(str(self.cPort.currentText()), BAUDRATE, ADS_ESCAPE, ADS_FIELDLEN)
-            except comm.ser.SerialException as e :
-                print(str(e))
+            if 0 == comm.Open(str(self.cPort.currentText()), BAUDRATE, ADS_ESCAPE, ADS_FIELDLEN) :
                 self.statusBar().showMessage('Error connecting to ' + str(self.cPort.currentText()))
             else :
                 # change this to disconnect
                 self.bConnect.setText('Disconnect')
                 self.statusBar().showMessage('Connected.')
-                self.tSerialListener.start()
                 for widget in self.onlineWidgets :
                     widget.setDisabled(False)
     
@@ -419,6 +421,8 @@ class cMainGui(QtGui.QMainWindow) :
     # This routine runs every 50 ms and checks for new input from the serial port.
     # this is not a respone from a command, but debug input or something.
     def serialTimer(self) :
+        #while len(self.delayedcalls) > 0 :
+        #    self.delayedcalls.pop()()       # execute the delayed call
         comm.DumpToConsole()
 
     # This routine runs every 200 ms and updates all fields with their "auto"
