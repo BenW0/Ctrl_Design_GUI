@@ -53,6 +53,7 @@ class Serobj() :
         self.serobj.setPort(port)
         self.serobj.setBaudrate(speed)
         self.serobj.setTimeout(5)
+        self.port = port
         try :
             self.serobj.open()
         except self.serobj.SerialException as e :

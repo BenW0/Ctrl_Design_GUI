@@ -33,7 +33,7 @@ import machineInterface as mach
 
 import plotgui
 
-histStruct = struct.Struct("=Llffffl")
+histStruct = struct.Struct("=LlfffflB")
 ##typedef struct
 ##{
 ##  uint32_t time;
@@ -44,6 +44,7 @@ histStruct = struct.Struct("=Llffffl")
 ##  float target_pos;
 ##  float target_vel;
 ##  int32_t motor_position;
+##  uchar8_t flags;
 ##} hist_data_t;
 
 DS_STREAM_HIST = 0           # data stream used for history downloading
@@ -90,14 +91,16 @@ def convertBinaryDump(fname_in, fname_out) :
     same as converting a binary dump from the old over-serial ADS stream because
     it does not use separator characters."""
     with open(fname_in, "rb") as fin, open(fname_out, "w") as fout :
-         while True :
+        # print out the header
+        fout.write("Time (*10us), Position (tics), Position Error Derivative (tics), Cmd Vel (tics/min), Target Pos (tics), Target Vel (tics), Motor Position (tics), Flags\n")
+        while True :
             chunk = fin.read(histStruct.size)
             if len(chunk) < histStruct.size :
                 break
             else :
                 # parse out a hist struct
                 d = histStruct.unpack(chunk)
-                fout.write("%f, %i, %f, %f, %f, %f, %i\n" % d)
+                fout.write("%f, %i, %f, %f, %f, %f, %i, %i\n" % d)
 
 # Plotting Class - plots single plots and data streams.
 # The next few script functions implement streaming data plotting, using the 
@@ -364,7 +367,7 @@ class Plotter :
         than the old plotter.startStreamPlot mode, which used the serial console."""
         # tell the rawhid interface program to start saving out data streams
         self.streaming = True
-        fbase = "streams/" + timeStamped("")
+        fbase = "streams/" + timeStamped(comm.port)
         self.stream_fname = fbase + "stream.bin"
         comm.DataStreamStartSave(DS_STREAM_HIST, self.stream_fname)
         

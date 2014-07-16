@@ -65,6 +65,7 @@ class Rawhid() :
     # speed, extra and extra2 are retained for backwards-compatibility
     def Open(self, port='0', speed='n/a', extra='', extra2='') :
         self.proc.writeData('n ' + port + '\n')
+        self.port = port
         print 'n ' + port + '\n'
         # we don't actually check that it opened...at least not for now.
         self.open = True
