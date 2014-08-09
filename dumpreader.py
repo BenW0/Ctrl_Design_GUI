@@ -32,7 +32,7 @@ from PyQt4 import uic, QtCore, QtGui
 import plotgui
 
 
-histStruct = struct.Struct("=Llffffl")
+histStruct = struct.Struct("=LlfffflB")
 ##typedef struct
 ##{
 ##  uint32_t time;
@@ -188,7 +188,7 @@ class cDumpReader(QtGui.QMainWindow) :
         # load items into the list widget
         
         
-        for file in os.listdir('dumps') :
+        for file in os.listdir('streams') :
             if file[-3:].lower() == 'csv' :
                 listItem = QtGui.QListWidgetItem(file[:-4], self.listWidget)
         
@@ -204,7 +204,7 @@ class cDumpReader(QtGui.QMainWindow) :
         event.accept()
     
     def listWidget_Changed(self, selected, deselected) :
-        readDump(os.getcwd() + '/dumps/' + selected.text() + '.csv')
+        readDump(os.getcwd() + '/streams/' + selected.text() + '.csv')
         
 
 app = None
