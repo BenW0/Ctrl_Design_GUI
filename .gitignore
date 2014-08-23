@@ -2,3 +2,4 @@ dumps/
 streams/
 *.pyc
 *.exe
+rawhid_listener/rawhid_listener_vsproj
