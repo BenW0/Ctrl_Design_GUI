@@ -1,7 +1,7 @@
 # Controller Configuration GUI
 This repository contains the host-side code for configuring, offline-manipulation, and data collection for a Closed-Loop Intelligent Motor Controller platform.
 
-Companion firmware, schamtics, etc: <<<Ref for embedded code>>>
+Companion firmware, schamtics, etc: https://sites.google.com/site/benweisspublic/projects/imc-closed-loop-control
 
 (c) 2014, Ben Weiss. See COPYING for licence agreement.
 
