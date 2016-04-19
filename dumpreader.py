@@ -38,10 +38,9 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import comm
 import time
 import struct
-import sip
+#import sip
 import sys
 import re
 import os
@@ -193,7 +192,7 @@ def closeWindows() :
         fig.hide()
         fig.close()
         fig.deleteLater()
-        sip.delete(fig)
+        #sip.delete(fig)
     while len(figwindows) > 0 :
         figwindows.pop()
         
@@ -234,11 +233,8 @@ def start_gui() :
     global app
     # load the gui
     app = QtGui.QApplication(sys.argv)
-    try :
-        myMainWindow = cDumpReader()
-        app.exec_()
-    finally :
-        comm.Close()
+    myMainWindow = cDumpReader()
+    app.exec_()
 
 
 if __name__ == "__main__" :
